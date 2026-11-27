@@ -1,0 +1,185 @@
+name: BiblioTech CD
+
+# Entrega continua: cada vez que se integra algo en main se publican las imágenes con su versión
+# y se despliegan. También se puede lanzar a mano indicando una versión ya publicada (rollback).
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Versión ya publicada que se quiere desplegar (rollback), por ejemplo 1.0.0. Vacío = publicar la versión del archivo VERSION.'
+        required: false
+        default: ''
+
+permissions:
+  contents: write   # crear la etiqueta de versión (vX.Y.Z)
+  packages: write   # publicar las imágenes en el registro de GitHub
+
+# Un solo despliegue a la vez, sin cancelar el que está en curso.
+concurrency:
+  group: cd-produccion
+  cancel-in-progress: false
+
+jobs:
+  version:
+    name: Determinar la versión
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.v.outputs.version }}
+      construir: ${{ steps.v.outputs.construir }}
+    steps:
+      - name: Obtener código
+        uses: actions/checkout@v4
+
+      - name: Leer la versión
+        id: v
+        env:
+          VERSION_PEDIDA: ${{ inputs.version }}
+        run: |
+          if [ -n "$VERSION_PEDIDA" ]; then
+            VERSION="$VERSION_PEDIDA"
+            CONSTRUIR=false
+          else
+            VERSION="$(tr -d '[:space:]' < VERSION)"
+            CONSTRUIR=true
+          fi
+          if ! echo "$VERSION" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+$'; then
+            echo "::error::La versión '$VERSION' no sigue el formato X.Y.Z"
+            exit 1
+          fi
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "construir=$CONSTRUIR" >> "$GITHUB_OUTPUT"
+
+  publicar:
+    name: Publicar imagen de ${{ matrix.nombre }}
+    runs-on: ubuntu-latest
+    needs: version
+    if: needs.version.outputs.construir == 'true'
+    strategy:
+      matrix:
+        nombre: [backend, frontend]
+    steps:
+      - name: Obtener código
+        uses: actions/checkout@v4
+
+      - name: Configurar Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Autenticarse en el registro de GitHub
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Calcular el nombre de la imagen
+        id: img
+        run: |
+          PROPIETARIO="$(echo "$GITHUB_REPOSITORY_OWNER" | tr '[:upper:]' '[:lower:]')"
+          echo "nombre=ghcr.io/$PROPIETARIO/bibliotech-${{ matrix.nombre }}" >> "$GITHUB_OUTPUT"
+
+      - name: Construir y publicar (con caché)
+        uses: docker/build-push-action@v6
+        with:
+          context: ./${{ matrix.nombre }}
+          push: true
+          tags: |
+            ${{ steps.img.outputs.nombre }}:${{ needs.version.outputs.version }}
+            ${{ steps.img.outputs.nombre }}:latest
+            ${{ steps.img.outputs.nombre }}:sha-${{ github.sha }}
+          cache-from: type=gha,scope=${{ matrix.nombre }}
+          cache-to: type=gha,mode=max,scope=${{ matrix.nombre }}
+
+  etiquetar:
+    name: Crear la etiqueta de versión
+    runs-on: ubuntu-latest
+    needs: [version, publicar]
+    steps:
+      - name: Obtener código
+        uses: actions/checkout@v4
+
+      - name: Crear la etiqueta vX.Y.Z si no existe
+        env:
+          VERSION: ${{ needs.version.outputs.version }}
+        run: |
+          if git ls-remote --exit-code --tags origin "refs/tags/v$VERSION" > /dev/null; then
+            echo "La etiqueta v$VERSION ya existe; no se crea otra."
+          else
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git tag -a "v$VERSION" -m "Versión $VERSION"
+            git push origin "v$VERSION"
+          fi
+
+  desplegar:
+    name: Desplegar en producción
+    runs-on: ubuntu-latest
+    needs: [version, publicar]
+    # Se despliega si se publicó, o si se pidió una versión ya publicada (rollback).
+    if: ${{ !cancelled() && needs.version.result == 'success' && (needs.publicar.result == 'success' || needs.publicar.result == 'skipped') }}
+    environment:
+      name: produccion
+      url: ${{ vars.APP_URL }}
+    env:
+      VERSION: ${{ needs.version.outputs.version }}
+    steps:
+      - name: Calcular las imágenes a desplegar
+        id: img
+        run: |
+          PROPIETARIO="$(echo "$GITHUB_REPOSITORY_OWNER" | tr '[:upper:]' '[:lower:]')"
+          echo "backend=ghcr.io/$PROPIETARIO/bibliotech-backend:$VERSION" >> "$GITHUB_OUTPUT"
+          echo "frontend=ghcr.io/$PROPIETARIO/bibliotech-frontend:$VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Desplegar el backend
+        env:
+          DEPLOY_HOOK: ${{ secrets.DEPLOY_HOOK_BACKEND }}
+          IMAGEN: ${{ steps.img.outputs.backend }}
+        run: |
+          if [ -z "$DEPLOY_HOOK" ]; then
+            echo "::notice::DEPLOY_HOOK_BACKEND no está configurado: se omite el despliegue del backend."
+            exit 0
+          fi
+          IMAGEN_CODIFICADA="$(jq -rn --arg u "$IMAGEN" '$u|@uri')"
+          curl -fsS -X POST "${DEPLOY_HOOK}&imgURL=${IMAGEN_CODIFICADA}"
+          echo "Backend: se pidió el despliegue de $IMAGEN"
+
+      - name: Desplegar el frontend
+        env:
+          DEPLOY_HOOK: ${{ secrets.DEPLOY_HOOK_FRONTEND }}
+          IMAGEN: ${{ steps.img.outputs.frontend }}
+        run: |
+          if [ -z "$DEPLOY_HOOK" ]; then
+            echo "::notice::DEPLOY_HOOK_FRONTEND no está configurado: se omite el despliegue del frontend."
+            exit 0
+          fi
+          IMAGEN_CODIFICADA="$(jq -rn --arg u "$IMAGEN" '$u|@uri')"
+          curl -fsS -X POST "${DEPLOY_HOOK}&imgURL=${IMAGEN_CODIFICADA}"
+          echo "Frontend: se pidió el despliegue de $IMAGEN"
+
+      - name: Comprobar el sistema desplegado (HTTPS y frontend conectado al backend)
+        env:
+          APP_URL: ${{ vars.APP_URL }}
+        run: |
+          if [ -z "$APP_URL" ]; then
+            echo "::notice::La variable APP_URL no está configurada: se omite la comprobación."
+            exit 0
+          fi
+          case "$APP_URL" in
+            https://*) ;;
+            *) echo "::error::APP_URL debe empezar con https://"; exit 1 ;;
+          esac
+          for intento in $(seq 1 36); do
+            CODIGO="$(curl -s -o /dev/null -w '%{http_code}' "$APP_URL/api/libros" || true)"
+            echo "Intento $intento: /api/libros respondió $CODIGO"
+            if [ "$CODIGO" = "200" ]; then
+              curl -fsS -o /dev/null "$APP_URL"
+              echo "### Despliegue correcto" >> "$GITHUB_STEP_SUMMARY"
+              echo "- Versión: $VERSION" >> "$GITHUB_STEP_SUMMARY"
+              echo "- URL: $APP_URL (HTTPS)" >> "$GITHUB_STEP_SUMMARY"
+              exit 0
+            fi
+            sleep 10
+          done
+          echo "::error::El sistema no respondió 200 en $APP_URL/api/libros"
+          exit 1

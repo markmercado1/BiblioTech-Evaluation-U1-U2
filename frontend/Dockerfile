@@ -14,7 +14,11 @@ RUN npm run build
 # ETAPA 2: SERVIDOR WEB NGINX
 FROM nginx:alpine
 
-COPY nginx.conf /etc/nginx/conf.d/default.conf
+# nginx reemplaza ${PORT} y ${BACKEND_URL} de la plantilla al arrancar el contenedor
+ENV PORT=80
+ENV BACKEND_URL=http://backend:8080
+
+COPY nginx.conf.template /etc/nginx/templates/default.conf.template
 
 COPY --from=build /app/dist/bibliotech-v2fe/browser/ /usr/share/nginx/html/
 

@@ -25,7 +25,7 @@ describe('EstudianteService', () => {
       expect(estudiante.estado).toBe('ACTIVO');
     });
 
-    const req = httpMock.expectOne('http://localhost:8080/api/estudiantes');
+    const req = httpMock.expectOne('/api/estudiantes');
     expect(req.request.method).toBe('POST');
     expect(req.request.body).toEqual({ dni: '70000001', nombre: 'Ana' });
 

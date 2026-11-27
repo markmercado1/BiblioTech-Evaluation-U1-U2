@@ -78,7 +78,20 @@ El workflow `ci.yml` se ejecuta en cada push y pull request hacia `main` y `deve
 `sonar.yml` envía el código y la cobertura a SonarCloud y aplica el quality gate.
 La política de ramas, la revisión de pull requests y los secretos están en [docs/politica-ramas.md](docs/politica-ramas.md).
 
-## Variables de entorno
+## Entrega y despliegue
 
-Copiar `.env.example` a `.env` y completar los valores. El archivo `.env` no se sube al repositorio.
+`cd.yml` se ejecuta al integrar en `main`: publica las imágenes `bibliotech-backend` y `bibliotech-frontend` en el
+registro de GitHub con la versión del archivo `VERSION`, crea la etiqueta `vX.Y.Z` y despliega con comprobación por HTTPS.
+También permite volver a una versión anterior (rollback) ejecutándolo a mano con esa versión.
+Ver [docs/despliegue.md](docs/despliegue.md) y [docs/estrategia-entrega.md](docs/estrategia-entrega.md).
+
+## Perfiles y variables de entorno
+
+El backend tiene los perfiles `dev` (por defecto) y `prod`, elegidos con `SPRING_PROFILES_ACTIVE`.
+**Ningún archivo del repositorio contiene contraseñas**: la contraseña de la base de datos se lee de
+`SPRING_DATASOURCE_PASSWORD`. Para ejecutar el backend o sus pruebas fuera de Docker hay que definir esa variable
+(y, si hace falta, `SPRING_DATASOURCE_URL` y `SPRING_DATASOURCE_USERNAME`).
+
+Con Docker Compose, copiar `.env.example` a `.env` y completar los valores. El archivo `.env` no se sube al repositorio.
 `docker compose up -d --build` falla con un mensaje claro si falta alguna variable.
+En desarrollo con `ng serve`, las llamadas a `/api` se reenvían al backend en `localhost:8080` mediante `proxy.conf.json`.

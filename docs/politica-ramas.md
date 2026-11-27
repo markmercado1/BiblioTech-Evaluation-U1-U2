@@ -64,3 +64,6 @@ Las contraseñas y los tokens viven solo en **Settings → Secrets and variables
 |---|---|
 | `SONAR_TOKEN` | Análisis de SonarCloud |
 | `CI_DB_PASSWORD` | Contraseña de la base de datos efímera que usa el CI |
+| `DEPLOY_HOOK_BACKEND` y `DEPLOY_HOOK_FRONTEND` | URL con las que `cd.yml` ordena el despliegue al hosting |
+
+La variable (no secreta) `APP_URL` guarda la dirección HTTPS pública. El detalle está en [despliegue.md](despliegue.md).

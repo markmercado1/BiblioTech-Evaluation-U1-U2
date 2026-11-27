@@ -56,6 +56,24 @@ jobs:
         working-directory: backend
         run: mvn -B verify
 
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Instalar dependencias del frontend
+        working-directory: frontend
+        run: npm ci
+
+      - name: Ejecutar pruebas de Angular y generar su cobertura
+        working-directory: frontend
+        run: npx ng test --watch=false
+
+      - name: Ajustar las rutas del reporte lcov a la raíz del repositorio
+        run: sed -i 's|^SF:|SF:frontend/|' frontend/coverage/bibliotech-v2fe/lcov.info
+
       - name: Analizar con SonarQube Cloud
         uses: SonarSource/sonarqube-scan-action@v5
         env:

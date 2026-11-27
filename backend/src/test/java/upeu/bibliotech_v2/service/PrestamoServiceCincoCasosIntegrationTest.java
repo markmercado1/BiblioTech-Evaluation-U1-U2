@@ -1,6 +1,4 @@
-package upeu.bibliotech_v2.integracion;
-
-import upeu.bibliotech_v2.service.PrestamoService;
+package upeu.bibliotech_v2.service;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

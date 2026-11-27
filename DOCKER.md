@@ -2,7 +2,7 @@
 
 Documentación técnica del despliegue local de BiblioTech (Spring Boot + Angular + PostgreSQL) con contenedores.
 
-Repositorio: <https://github.com/markmercado1/BiblioTech-Evaluation-U1-U2>
+Repositorio: <https://github.com/markmercado1/BiblioTech-Develop>
 
 ## 1. Requisitos previos
 

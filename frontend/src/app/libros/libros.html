@@ -1,0 +1,111 @@
+<div class="tarjeta ancha">
+
+  <h2>Catálogo de libros</h2>
+  <p class="subtitulo">Registra un libro nuevo y consulta los libros del sistema</p>
+
+  <form [formGroup]="formulario" (ngSubmit)="registrar()" novalidate>
+
+    <div class="campo">
+      <label for="isbn">ISBN</label>
+      <input
+        id="isbn"
+        type="text"
+        formControlName="isbn"
+        [class.invalido]="mostrarError('isbn')">
+      @if (mostrarError('isbn')) {
+        <p id="errorIsbn" class="error-campo">El ISBN es obligatorio.</p>
+      }
+    </div>
+
+    <div class="campo">
+      <label for="titulo">Título</label>
+      <input
+        id="titulo"
+        type="text"
+        formControlName="titulo"
+        [class.invalido]="mostrarError('titulo')">
+      @if (mostrarError('titulo')) {
+        <p id="errorTitulo" class="error-campo">El título es obligatorio.</p>
+      }
+    </div>
+
+    <div class="campo">
+      <label for="autor">Autor</label>
+      <input
+        id="autor"
+        type="text"
+        formControlName="autor"
+        [class.invalido]="mostrarError('autor')">
+      @if (mostrarError('autor')) {
+        <p id="errorAutor" class="error-campo">El autor es obligatorio.</p>
+      }
+    </div>
+
+    <div class="campo">
+      <label for="ejemplares">Ejemplares disponibles</label>
+      <input
+        id="ejemplares"
+        type="number"
+        formControlName="ejemplaresDisponibles"
+        [class.invalido]="mostrarError('ejemplaresDisponibles')">
+      @if (mostrarError('ejemplaresDisponibles')) {
+        <p id="errorEjemplares" class="error-campo">Los ejemplares no pueden ser negativos.</p>
+      }
+    </div>
+
+    <div class="acciones">
+      <button id="btnRegistrarLibro" type="submit" class="btn-registrar">
+        Registrar libro
+      </button>
+    </div>
+
+  </form>
+
+  @if (mensaje()) {
+    <div
+      id="resultadoLibro"
+      class="resultado"
+      [class.correcto]="registroCorrecto()"
+      [class.error]="registroCorrecto() === false">
+      {{ mensaje() }}
+    </div>
+  }
+
+  <hr class="separador">
+
+  <h2>Libros registrados</h2>
+
+  <table id="tablaLibros">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>ISBN</th>
+        <th>Título</th>
+        <th>Autor</th>
+        <th>Ejemplares</th>
+        <th>Estado</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (libro of libros(); track libro.id) {
+        <tr data-cy="fila-libro">
+          <td>{{ libro.id }}</td>
+          <td>{{ libro.isbn }}</td>
+          <td>{{ libro.titulo }}</td>
+          <td>{{ libro.autor }}</td>
+          <td data-cy="ejemplares">{{ libro.ejemplaresDisponibles }}</td>
+          <td
+            [class.estado-disponible]="libro.estado === 'DISPONIBLE'"
+            [class.estado-no-disponible]="libro.estado !== 'DISPONIBLE'">
+            {{ libro.estado }}
+          </td>
+        </tr>
+      } @empty {
+        <tr>
+          <td colspan="6">No hay libros registrados.</td>
+        </tr>
+      }
+    </tbody>
+  </table>
+
+</div>

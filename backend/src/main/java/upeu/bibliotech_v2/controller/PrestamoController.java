@@ -46,4 +46,9 @@ public class PrestamoController {
 
         return ResponseEntity.ok(prestamo);
     }
+
+    @PutMapping("/{id}/devolucion")
+    public ResponseEntity<Prestamo> devolverLibro(@PathVariable Long id) {
+        return ResponseEntity.ok(prestamoService.devolverLibro(id));
+    }
 }

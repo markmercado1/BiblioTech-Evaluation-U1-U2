@@ -1,4 +1,6 @@
-package upeu.bibliotech_v2.service;
+package upeu.bibliotech_v2.integracion;
+
+import upeu.bibliotech_v2.service.PrestamoService;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -27,13 +29,13 @@ class PrestamoServiceCincoCasosIntegrationTest {
     private JdbcTemplate jdbc;
 
     private void crearEstudiante(long id, String estado) {
-        jdbc.update("INSERT INTO estudiantes (id, nombre, estado) VALUES (?, ?, ?)",
-                id, "Estudiante " + id, estado);
+        jdbc.update("INSERT INTO estudiantes (id, dni, nombre, estado) VALUES (?, ?, ?, ?)",
+                id, "DNI-" + id, "Estudiante " + id, estado);
     }
 
     private void crearLibro(long id, int ejemplares) {
-        jdbc.update("INSERT INTO libros (id, titulo, autor, ejemplares_disponibles) VALUES (?, ?, ?, ?)",
-                id, "Libro " + id, "Autor de prueba", ejemplares);
+        jdbc.update("INSERT INTO libros (id, isbn, titulo, autor, ejemplares_disponibles) VALUES (?, ?, ?, ?, ?)",
+                id, "ISBN-" + id, "Libro " + id, "Autor de prueba", ejemplares);
     }
 
     private void crearPrestamosActivos(long estudianteId, long libroId, int cantidad) {

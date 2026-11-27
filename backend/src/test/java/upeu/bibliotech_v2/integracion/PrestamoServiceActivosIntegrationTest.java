@@ -1,4 +1,6 @@
-package upeu.bibliotech_v2.service;
+package upeu.bibliotech_v2.integracion;
+
+import upeu.bibliotech_v2.service.PrestamoService;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

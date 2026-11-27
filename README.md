@@ -65,6 +65,33 @@ Las pruebas del backend leen la conexión de las variables `SPRING_DATASOURCE_UR
 Los flujos de Cypress y la colección de Postman crean sus propios datos con valores únicos,
 por lo que se pueden repetir sin limpiar la base.
 
-## Variables de entorno
+## Integración continua
 
-Copiar `.env.example` a `.env` y completar los valores. El archivo `.env` no se sube al repositorio.
+El workflow `ci.yml` se ejecuta en cada push y pull request hacia `main` y `develop`:
+
+| Job | Qué hace |
+|---|---|
+| Backend | `mvn verify`: compila, ejecuta las pruebas de la Unidad 1 y exige JaCoCo ≥ 80 %; caché de Maven |
+| Frontend | `ng lint`, `ng test` con cobertura y `ng build`; caché de npm |
+| Contenedores | `docker compose up -d --build` y comprobación de que el backend y el frontend responden |
+
+`sonar.yml` envía el código y la cobertura a SonarCloud y aplica el quality gate.
+La política de ramas, la revisión de pull requests y los secretos están en [docs/politica-ramas.md](docs/politica-ramas.md).
+
+## Entrega y despliegue
+
+`cd.yml` se ejecuta al integrar en `main`: publica las imágenes `bibliotech-backend` y `bibliotech-frontend` en el
+registro de GitHub con la versión del archivo `VERSION`, crea la etiqueta `vX.Y.Z` y despliega con comprobación por HTTPS.
+También permite volver a una versión anterior (rollback) ejecutándolo a mano con esa versión.
+Ver [docs/despliegue.md](docs/despliegue.md) y [docs/estrategia-entrega.md](docs/estrategia-entrega.md).
+
+## Perfiles y variables de entorno
+
+El backend tiene los perfiles `dev` (por defecto) y `prod`, elegidos con `SPRING_PROFILES_ACTIVE`.
+**Ningún archivo del repositorio contiene contraseñas**: la contraseña de la base de datos se lee de
+`SPRING_DATASOURCE_PASSWORD`. Para ejecutar el backend o sus pruebas fuera de Docker hay que definir esa variable
+(y, si hace falta, `SPRING_DATASOURCE_URL` y `SPRING_DATASOURCE_USERNAME`).
+
+Con Docker Compose, copiar `.env.example` a `.env` y completar los valores. El archivo `.env` no se sube al repositorio.
+`docker compose up -d --build` falla con un mensaje claro si falta alguna variable.
+En desarrollo con `ng serve`, las llamadas a `/api` se reenvían al backend en `localhost:8080` mediante `proxy.conf.json`.

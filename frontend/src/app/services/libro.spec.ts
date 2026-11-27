@@ -26,7 +26,7 @@ describe('LibroService', () => {
       expect(libros[0].estado).toBe('DISPONIBLE');
     });
 
-    const req = httpMock.expectOne('http://localhost:8080/api/libros');
+    const req = httpMock.expectOne('/api/libros');
     expect(req.request.method).toBe('GET');
 
     req.flush([{
@@ -42,7 +42,7 @@ describe('LibroService', () => {
       expect(libro.id).toBe(2);
     });
 
-    const req = httpMock.expectOne('http://localhost:8080/api/libros');
+    const req = httpMock.expectOne('/api/libros');
     expect(req.request.method).toBe('POST');
     expect(req.request.body).toEqual(nuevo);
 
@@ -56,7 +56,7 @@ describe('LibroService', () => {
       error: (error) => (estado = error.status)
     });
 
-    httpMock.expectOne('http://localhost:8080/api/libros')
+    httpMock.expectOne('/api/libros')
       .flush({ mensaje: 'El ISBN es obligatorio' }, { status: 400, statusText: 'Bad Request' });
 
     expect(estado).toBe(400);

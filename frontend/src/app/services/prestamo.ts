@@ -20,7 +20,7 @@ export interface PrestamoRegistrado {
 
 export class Prestamo {
 
-  private readonly apiUrl = 'http://localhost:8080/api/prestamos';
+  private readonly apiUrl = '/api/prestamos';
   private readonly http = inject(HttpClient);
 
   validarPrestamo(estudianteId: number, libroId: number): Observable<boolean> {

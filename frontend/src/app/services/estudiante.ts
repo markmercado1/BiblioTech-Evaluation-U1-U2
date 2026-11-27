@@ -19,7 +19,7 @@ export interface EstudianteRegistrado {
 })
 export class EstudianteService {
 
-  private readonly apiUrl = 'http://localhost:8080/api/estudiantes';
+  private readonly apiUrl = '/api/estudiantes';
   private readonly http = inject(HttpClient);
 
   registrar(estudiante: NuevoEstudiante): Observable<EstudianteRegistrado> {

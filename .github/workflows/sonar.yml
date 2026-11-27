@@ -2,10 +2,10 @@ name: SonarQube Cloud
 
 on:
   push:
-    branches: [develop]
+    branches: [main, develop]
   pull_request:
     types: [opened, synchronize, reopened]
-    branches: [develop]
+    branches: [main, develop]
   workflow_dispatch:
 
 permissions:
@@ -23,7 +23,7 @@ jobs:
         env:
           POSTGRES_DB: bibliotech_db
           POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: postgres_test
+          POSTGRES_PASSWORD: ${{ secrets.CI_DB_PASSWORD }}
         ports:
           - 5432:5432
         options: >-
@@ -35,7 +35,7 @@ jobs:
     env:
       SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/bibliotech_db
       SPRING_DATASOURCE_USERNAME: postgres
-      SPRING_DATASOURCE_PASSWORD: postgres_test
+      SPRING_DATASOURCE_PASSWORD: ${{ secrets.CI_DB_PASSWORD }}
       SPRING_PROFILES_ACTIVE: ci
 
     steps:

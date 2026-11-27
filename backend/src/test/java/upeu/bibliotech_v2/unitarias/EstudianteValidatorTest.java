@@ -50,6 +50,34 @@ class EstudianteValidatorTest {
     }
 
     @Test
+    @DisplayName("Estudiante con DNI nulo se rechaza")
+    void estudianteConDniNuloSeRechaza() {
+        // Arrange
+        Estudiante estudiante = new Estudiante(null, "Juan Perez", null);
+
+        // Act
+        DatoInvalidoException e = assertThrows(DatoInvalidoException.class,
+                () -> EstudianteValidator.validar(estudiante));
+
+        // Assert
+        assertEquals("El DNI es obligatorio", e.getMessage());
+    }
+
+    @Test
+    @DisplayName("Estudiante con nombre en blanco se rechaza")
+    void estudianteConNombreEnBlancoSeRechaza() {
+        // Arrange
+        Estudiante estudiante = new Estudiante("70000001", "   ", null);
+
+        // Act
+        DatoInvalidoException e = assertThrows(DatoInvalidoException.class,
+                () -> EstudianteValidator.validar(estudiante));
+
+        // Assert
+        assertEquals("El nombre es obligatorio", e.getMessage());
+    }
+
+    @Test
     @DisplayName("Estudiante nulo se rechaza")
     void estudianteNuloSeRechaza() {
         // Arrange + Act + Assert

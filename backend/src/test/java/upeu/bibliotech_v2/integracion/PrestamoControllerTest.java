@@ -1,4 +1,6 @@
-package upeu.bibliotech_v2.controller;
+package upeu.bibliotech_v2.integracion;
+
+import upeu.bibliotech_v2.controller.PrestamoController;
 
 
 import org.junit.jupiter.api.Test;

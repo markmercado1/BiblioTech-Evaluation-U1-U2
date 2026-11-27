@@ -80,7 +80,7 @@ La política de ramas, la revisión de pull requests y los secretos están en [d
 
 ## Entrega y despliegue
 
-`cd.yml` se ejecuta al integrar en `main`: publica las imágenes `bibliotech-backend` y `bibliotech-frontend` en el
+`cd.yml` se ejecuta al integrar en `main`: publica las imágenes `bibliotech-u2-backend` y `bibliotech-u2-frontend` en el
 registro de GitHub con la versión del archivo `VERSION`, crea la etiqueta `vX.Y.Z` y despliega con comprobación por HTTPS.
 También permite volver a una versión anterior (rollback) ejecutándolo a mano con esa versión.
 Ver [docs/despliegue.md](docs/despliegue.md) y [docs/estrategia-entrega.md](docs/estrategia-entrega.md).

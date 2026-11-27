@@ -31,7 +31,7 @@ feature/*  ──PR revisado──►  develop  ──PR revisado──►  main
 
 Se usa versionado semántico (`MAJOR.MINOR.PATCH`). La versión vigente está en el archivo `VERSION` de la raíz.
 Para publicar una versión nueva, el pull request `develop` → `main` cambia ese archivo (por ejemplo de `1.0.0` a `1.1.0`).
-Al integrarlo en `main`, `cd.yml` publica `bibliotech-backend` y `bibliotech-frontend` con tres etiquetas:
+Al integrarlo en `main`, `cd.yml` publica `bibliotech-u2-backend` y `bibliotech-u2-frontend` con tres etiquetas:
 
 | Etiqueta | Para qué sirve |
 |---|---|
@@ -73,10 +73,10 @@ Si faltan `DEPLOY_HOOK_*` o `APP_URL`, `cd.yml` publica las imágenes igualmente
 Render ofrece HTTPS automático, despliegue desde imágenes de un registro y un plan gratuito. Se entra con la cuenta de GitHub en https://render.com.
 Orden recomendado: primero se publican las imágenes (el pull request `develop` → `main` lanza `cd.yml`) y después se crean los servicios.
 
-1. **Hacer públicas las imágenes.** En GitHub: perfil → *Packages* → `bibliotech-backend` → *Package settings* → *Change visibility* → Public.
-   Repetir con `bibliotech-frontend`. (Alternativa: registrar en Render un token de lectura del registro.)
+1. **Hacer públicas las imágenes.** En GitHub: perfil → *Packages* → `bibliotech-u2-backend` → *Package settings* → *Change visibility* → Public.
+   Repetir con `bibliotech-u2-frontend`. (Alternativa: registrar en Render un token de lectura del registro.)
 2. **Base de datos.** *New → PostgreSQL*, nombre `bibliotech-db`, plan **Free**. Al crearse, anotar el *Hostname* interno, el *Database*, el *Username* y el *Password*.
-3. **Backend.** *New → Web Service → Existing Image*, imagen `ghcr.io/markmercado1/bibliotech-backend:latest`, nombre `bibliotech-backend`, la misma región que la base de datos y plan **Free**.
+3. **Backend.** *New → Web Service → Existing Image*, imagen `ghcr.io/markmercado1/bibliotech-u2-backend:latest`, nombre `bibliotech-backend`, la misma región que la base de datos y plan **Free**.
    Variables de entorno:
 
    | Variable | Valor |
@@ -88,7 +88,7 @@ Orden recomendado: primero se publican las imágenes (el pull request `develop` 
    | `JAVA_TOOL_OPTIONS` | `-XX:MaxRAMPercentage=65` (limita la memoria de Java al plan gratuito) |
 
    En *Advanced* → *Health Check Path*: `/api/libros`. Render asigna el puerto con `PORT`, que el backend ya lee.
-4. **Frontend.** *New → Web Service → Existing Image*, imagen `ghcr.io/markmercado1/bibliotech-frontend:latest`, nombre `bibliotech-frontend`, plan **Free**.
+4. **Frontend.** *New → Web Service → Existing Image*, imagen `ghcr.io/markmercado1/bibliotech-u2-frontend:latest`, nombre `bibliotech-frontend`, plan **Free**.
    Variable `BACKEND_URL` con la URL HTTPS que Render dio al backend (por ejemplo `https://bibliotech-backend.onrender.com`, sin barra final).
    El frontend llama a `/api` y nginx reenvía la petición al backend: el navegador solo habla con una dirección HTTPS.
 5. **Despliegue automático.** En cada servicio: *Settings → Deploy Hook*, copiar la URL.
@@ -106,4 +106,4 @@ La imagen indicada en el servicio de Render debe tener el mismo registro y repos
 
 - Pestaña **Actions → BiblioTech CD**: los jobs *Publicar*, *Crear la etiqueta* y *Desplegar* en verde.
 - Abrir `APP_URL`: debe cargar con candado HTTPS y mostrar la lista de libros (el frontend consume al backend desplegado).
-- `docker pull ghcr.io/markmercado1/bibliotech-backend:<versión>` confirma que la imagen existe con su versión.
+- `docker pull ghcr.io/markmercado1/bibliotech-u2-backend:<versión>` confirma que la imagen existe con su versión.

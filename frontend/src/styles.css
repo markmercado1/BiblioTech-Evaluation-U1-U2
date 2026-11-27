@@ -1,1 +1,169 @@
-/* You can add global styles to this file, and also import other style files */
+/* Estilos compartidos por las pantallas de BiblioTech */
+
+body {
+  margin: 0;
+}
+
+.contenedor {
+  min-height: 100vh;
+  background: #f4f6f9;
+  font-family: Arial, sans-serif;
+}
+
+.encabezado {
+  background: #173b67;
+  color: white;
+  padding: 24px 40px;
+}
+
+.encabezado h1 {
+  margin: 0;
+  font-size: 30px;
+}
+
+.encabezado p {
+  margin: 5px 0 0;
+  font-size: 14px;
+}
+
+.menu {
+  display: flex;
+  gap: 18px;
+  margin-top: 16px;
+}
+
+.menu a {
+  color: #cfe0f5;
+  text-decoration: none;
+  padding-bottom: 4px;
+  border-bottom: 2px solid transparent;
+}
+
+.menu a.activo {
+  color: white;
+  border-bottom-color: white;
+}
+
+.tarjeta {
+  width: 520px;
+  max-width: calc(100% - 40px);
+  box-sizing: border-box;
+  margin: 30px auto;
+  padding: 30px;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 3px 12px rgba(0,0,0,.12);
+}
+
+.tarjeta.ancha {
+  width: 760px;
+}
+
+.tarjeta h2 {
+  margin: 0;
+  color: #173b67;
+}
+
+.subtitulo {
+  color: #666;
+  margin-bottom: 25px;
+}
+
+.campo {
+  margin-bottom: 20px;
+}
+
+.campo label {
+  display: block;
+  font-weight: bold;
+  margin-bottom: 7px;
+}
+
+.campo input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 11px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 14px;
+}
+
+.campo input.invalido {
+  border-color: #c0392b;
+}
+
+.error-campo {
+  color: #c0392b;
+  font-size: 13px;
+  margin: 5px 0 0;
+}
+
+.acciones {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+button {
+  padding: 11px 18px;
+  border: 0;
+  border-radius: 5px;
+  color: white;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.btn-validar {
+  background: #1769aa;
+}
+
+.btn-registrar {
+  background: #218838;
+}
+
+.btn-devolver {
+  background: #b9770e;
+}
+
+.resultado {
+  margin-top: 25px;
+  padding: 15px;
+  border-radius: 5px;
+}
+
+.correcto {
+  background: #d4edda;
+  color: #155724;
+}
+
+.error {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 15px;
+  font-size: 14px;
+}
+
+th, td {
+  text-align: left;
+  padding: 9px 10px;
+  border-bottom: 1px solid #e3e6ea;
+}
+
+th {
+  color: #173b67;
+}
+
+.estado-disponible {
+  color: #155724;
+  font-weight: bold;
+}
+
+.estado-no-disponible {
+  color: #721c24;
+  font-weight: bold;
+}

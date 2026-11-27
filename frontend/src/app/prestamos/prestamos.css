@@ -1,0 +1,14 @@
+.separador {
+  border: 0;
+  border-top: 1px solid #e3e6ea;
+  margin: 28px 0;
+}
+
+.fila-doble {
+  display: flex;
+  gap: 15px;
+}
+
+.fila-doble .campo {
+  flex: 1;
+}

@@ -93,6 +93,20 @@ describe('Prestamo', () => {
   });
 
 
+  // PRUEBA: DEVOLUCIÓN DE UN LIBRO (RN-04)
+  it('debe devolver un préstamo con PUT a /devolucion', () => {
+
+    service.devolverLibro(5).subscribe(resultado => {
+      expect(resultado.estado).toBe('DEVUELTO');
+    });
+
+    const req = httpMock.expectOne('http://localhost:8080/api/prestamos/5/devolucion');
+
+    expect(req.request.method).toBe('PUT');
+
+    req.flush({ id: 5, estado: 'DEVUELTO' });
+  });
+
   // PRUEBA: CONSULTA DE PRÉSTAMOS ACTIVOS
   it('debe consultar los préstamos activos de un estudiante', () => {
 

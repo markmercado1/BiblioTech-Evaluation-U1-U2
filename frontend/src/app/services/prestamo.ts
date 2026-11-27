@@ -9,6 +9,11 @@ export interface PrestamoActivo {
   libro: { id: number; titulo: string };
 }
 
+export interface PrestamoRegistrado {
+  id: number;
+  estado: string;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -38,15 +43,22 @@ export class Prestamo {
     );
   }
 
-  registrarPrestamo(estudianteId: number, libroId: number): Observable<unknown> {
+  registrarPrestamo(estudianteId: number, libroId: number): Observable<PrestamoRegistrado> {
     const params = new HttpParams()
       .set('estudianteId', estudianteId)
       .set('libroId', libroId);
 
-    return this.http.post(
+    return this.http.post<PrestamoRegistrado>(
       this.apiUrl,
       null,
       { params }
+    );
+  }
+
+  devolverLibro(prestamoId: number): Observable<PrestamoRegistrado> {
+    return this.http.put<PrestamoRegistrado>(
+      `${this.apiUrl}/${prestamoId}/devolucion`,
+      null
     );
   }
 }

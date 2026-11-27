@@ -1,9 +1,9 @@
 import { Component, signal } from '@angular/core';
-import { Prestamos } from './components/prestamos/prestamos';
+import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 
 @Component({
   selector: 'app-root',
-  imports: [Prestamos],
+  imports: [RouterOutlet, RouterLink, RouterLinkActive],
   styleUrl: './app.css',
   templateUrl: './app.html',
 })

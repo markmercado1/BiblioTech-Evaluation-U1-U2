@@ -1,0 +1,152 @@
+<div class="tarjeta">
+
+  <h2>Registrar estudiante</h2>
+  <p class="subtitulo">Un estudiante nuevo queda con estado ACTIVO</p>
+
+  <div class="fila-doble">
+    <div class="campo">
+      <label for="dni">DNI</label>
+      <input id="dni" type="text" name="dni" [(ngModel)]="dni">
+    </div>
+
+    <div class="campo">
+      <label for="nombre">Nombre</label>
+      <input id="nombre" type="text" name="nombre" [(ngModel)]="nombre">
+    </div>
+  </div>
+
+  <div class="acciones">
+    <button id="btnRegistrarEstudiante" class="btn-registrar" (click)="registrarEstudiante()">
+      Registrar estudiante
+    </button>
+  </div>
+
+  @if (mensajeEstudiante()) {
+    <div
+      id="resultadoEstudiante"
+      class="resultado"
+      [class.correcto]="estudianteCorrecto()"
+      [class.error]="estudianteCorrecto() === false">
+      {{ mensajeEstudiante() }}
+    </div>
+  }
+
+</div>
+
+<div class="tarjeta">
+
+  <h2>Gestión de Préstamos</h2>
+  <p class="subtitulo">
+    Validación, registro y devolución de préstamos de libros
+  </p>
+
+  <div class="fila-doble">
+    <div class="campo">
+      <label for="estudianteId">ID Estudiante</label>
+      <input id="estudianteId" type="number" name="estudianteId" [(ngModel)]="estudianteId">
+    </div>
+
+    <div class="campo">
+      <label for="libroId">ID Libro</label>
+      <input id="libroId" type="number" name="libroId" [(ngModel)]="libroId">
+    </div>
+  </div>
+
+  <div class="acciones">
+
+    <button
+      id="btnValidar"
+      class="btn-validar"
+      (click)="validarPrestamo()">
+      Validar préstamo
+    </button>
+
+    <button
+      id="btnRegistrar"
+      class="btn-registrar"
+      (click)="registrarPrestamo()">
+      Registrar préstamo
+    </button>
+
+    <button
+      id="btnActivos"
+      class="btn-validar"
+      (click)="consultarPrestamosActivos()">
+      Ver préstamos activos
+    </button>
+
+  </div>
+
+  <hr class="separador">
+
+  <div class="campo">
+    <label for="prestamoId">N° de préstamo a devolver</label>
+    <input id="prestamoId" type="number" name="prestamoId" [(ngModel)]="prestamoId">
+  </div>
+
+  <div class="acciones">
+    <button
+      id="btnDevolver"
+      class="btn-devolver"
+      (click)="devolverLibro()">
+      Devolver libro
+    </button>
+  </div>
+
+  @if (consultaRealizada()) {
+    <div id="listaActivos" class="resultado correcto">
+      <strong>Préstamos activos del estudiante {{ estudianteId }}: {{ prestamosActivos().length }}</strong>
+      <ul>
+        @for (p of prestamosActivos(); track p.id) {
+          <li>N° {{ p.id }}: {{ p.libro.titulo }} (desde {{ p.fechaPrestamo }})</li>
+        }
+      </ul>
+    </div>
+  }
+
+  @if (mensaje()) {
+    <div
+      id="resultado"
+      class="resultado"
+      [class.correcto]="disponible()"
+      [class.error]="disponible() === false">
+      {{ mensaje() }}
+    </div>
+  }
+
+</div>
+
+<div class="tarjeta ancha">
+
+  <h2>Libros y ejemplares</h2>
+
+  <table id="tablaLibrosPrestamo">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Título</th>
+        <th>Ejemplares</th>
+        <th>Estado</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (libro of libros(); track libro.id) {
+        <tr data-cy="fila-libro">
+          <td>{{ libro.id }}</td>
+          <td>{{ libro.titulo }}</td>
+          <td data-cy="ejemplares">{{ libro.ejemplaresDisponibles }}</td>
+          <td
+            [class.estado-disponible]="libro.estado === 'DISPONIBLE'"
+            [class.estado-no-disponible]="libro.estado !== 'DISPONIBLE'">
+            {{ libro.estado }}
+          </td>
+        </tr>
+      } @empty {
+        <tr>
+          <td colspan="4">No hay libros registrados.</td>
+        </tr>
+      }
+    </tbody>
+  </table>
+
+</div>

@@ -18,6 +18,10 @@ server {
         proxy_pass ${BACKEND_URL};
         proxy_ssl_server_name on;
         proxy_set_header Host $proxy_host;
+        # Para el navegador, frontend y /api son el mismo origen: no se reenvía Origin al backend.
+        # Sin esto, el backend trata la petición como CORS y rechaza con 403 los POST/PUT
+        # que llegan desde la dirección pública del frontend.
+        proxy_set_header Origin "";
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-Proto $http_x_forwarded_proto;
     }

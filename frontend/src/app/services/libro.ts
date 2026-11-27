@@ -23,7 +23,7 @@ export interface NuevoLibro {
 })
 export class LibroService {
 
-  private readonly apiUrl = 'http://localhost:8080/api/libros';
+  private readonly apiUrl = '/api/libros';
   private readonly http = inject(HttpClient);
 
   listar(): Observable<Libro[]> {

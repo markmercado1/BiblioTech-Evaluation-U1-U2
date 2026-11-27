@@ -42,7 +42,7 @@ describe('Prestamo', () => {
     });
 
     const req = httpMock.expectOne(request =>
-      request.url === 'http://localhost:8080/api/prestamos/validar' &&
+      request.url === '/api/prestamos/validar' &&
       request.params.get('estudianteId') === '1' &&
       request.params.get('libroId') === '1'
     );
@@ -60,7 +60,7 @@ describe('Prestamo', () => {
     });
 
     const req = httpMock.expectOne(request =>
-      request.url === 'http://localhost:8080/api/prestamos/validar' &&
+      request.url === '/api/prestamos/validar' &&
       request.params.get('estudianteId') === '1' &&
       request.params.get('libroId') === '1'
     );
@@ -82,7 +82,7 @@ describe('Prestamo', () => {
     });
 
     const req = httpMock.expectOne(request =>
-      request.url === 'http://localhost:8080/api/prestamos' &&
+      request.url === '/api/prestamos' &&
       request.params.get('estudianteId') === '1' &&
       request.params.get('libroId') === '2'
     );
@@ -100,7 +100,7 @@ describe('Prestamo', () => {
       expect(resultado.estado).toBe('DEVUELTO');
     });
 
-    const req = httpMock.expectOne('http://localhost:8080/api/prestamos/5/devolucion');
+    const req = httpMock.expectOne('/api/prestamos/5/devolucion');
 
     expect(req.request.method).toBe('PUT');
 
@@ -116,7 +116,7 @@ describe('Prestamo', () => {
     });
 
     const req = httpMock.expectOne(request =>
-      request.url === 'http://localhost:8080/api/prestamos/activos' &&
+      request.url === '/api/prestamos/activos' &&
       request.params.get('estudianteId') === '1'
     );
 

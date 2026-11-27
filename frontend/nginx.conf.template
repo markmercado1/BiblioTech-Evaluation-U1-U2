@@ -1,0 +1,24 @@
+# Plantilla de nginx: el contenedor reemplaza las variables PORT y BACKEND_URL al arrancar.
+#   PORT        puerto en el que escucha (80 por defecto; el hosting asigna el suyo)
+#   BACKEND_URL dirección del backend (http://backend:8080 en Docker Compose;
+#               la URL HTTPS del backend desplegado en producción)
+server {
+    listen ${PORT};
+    server_name localhost;
+
+    root /usr/share/nginx/html;
+    index index.html;
+
+    location / {
+        try_files $uri $uri/ /index.html;
+    }
+
+    # El frontend llama a /api y nginx reenvía la petición al backend.
+    location /api/ {
+        proxy_pass ${BACKEND_URL};
+        proxy_ssl_server_name on;
+        proxy_set_header Host $proxy_host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-Proto $http_x_forwarded_proto;
+    }
+}

@@ -65,6 +65,20 @@ Las pruebas del backend leen la conexión de las variables `SPRING_DATASOURCE_UR
 Los flujos de Cypress y la colección de Postman crean sus propios datos con valores únicos,
 por lo que se pueden repetir sin limpiar la base.
 
+## Integración continua
+
+El workflow `ci.yml` se ejecuta en cada push y pull request hacia `main` y `develop`:
+
+| Job | Qué hace |
+|---|---|
+| Backend | `mvn verify`: compila, ejecuta las pruebas de la Unidad 1 y exige JaCoCo ≥ 80 %; caché de Maven |
+| Frontend | `ng lint`, `ng test` con cobertura y `ng build`; caché de npm |
+| Contenedores | `docker compose up -d --build` y comprobación de que el backend y el frontend responden |
+
+`sonar.yml` envía el código y la cobertura a SonarCloud y aplica el quality gate.
+La política de ramas, la revisión de pull requests y los secretos están en [docs/politica-ramas.md](docs/politica-ramas.md).
+
 ## Variables de entorno
 
 Copiar `.env.example` a `.env` y completar los valores. El archivo `.env` no se sube al repositorio.
+`docker compose up -d --build` falla con un mensaje claro si falta alguna variable.

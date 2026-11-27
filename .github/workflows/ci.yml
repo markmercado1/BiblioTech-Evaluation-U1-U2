@@ -136,6 +136,17 @@ jobs:
           curl -fsS http://localhost:4200 > /dev/null
           docker compose ps
 
+      - name: Comprobar que el frontend puede escribir en el backend desde otra dirección pública
+        run: |
+          # Simula el navegador con el frontend desplegado en una dirección HTTPS distinta de localhost.
+          # Sin el ajuste de nginx que quita la cabecera Origin, el backend respondería 403.
+          CODIGO="$(curl -s -o /dev/null -w '%{http_code}' -X POST http://localhost:4200/api/estudiantes \
+            -H 'Content-Type: application/json' \
+            -H 'Origin: https://bibliotech-frontend.onrender.com' \
+            -d "{\"dni\":\"ci-$(date +%s)\",\"nombre\":\"Prueba CI\"}")"
+          echo "POST /api/estudiantes con Origin externo respondió $CODIGO"
+          test "$CODIGO" = "201"
+
       - name: Mostrar los registros si algo falló
         if: failure()
         run: docker compose logs --no-color

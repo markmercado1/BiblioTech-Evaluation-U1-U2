@@ -123,6 +123,22 @@ class PrestamoServiceMockitoTest {
     }
 
     @Test
+    @DisplayName("Validar préstamo (pantalla): con libro inexistente lanza excepción")
+    void puedePrestarConLibroInexistenteLanzaExcepcion() {
+        // Arrange
+        when(estudianteRepository.findById(1L)).thenReturn(Optional.of(estudianteActivo()));
+        when(prestamoRepository.countByEstudianteIdAndEstado(1L, "ACTIVO")).thenReturn(0L);
+        when(libroRepository.findById(99L)).thenReturn(Optional.empty());
+
+        // Act
+        RuntimeException e = assertThrows(RuntimeException.class,
+                () -> prestamoService.puedePrestar(1L, 99L));
+
+        // Assert
+        assertEquals("Libro no existe", e.getMessage());
+    }
+
+    @Test
     @DisplayName("Devolver libro exitoso: sube un ejemplar y el préstamo pasa a DEVUELTO")
     void devolverLibroExitosoGuardaCambios() {
         // Arrange

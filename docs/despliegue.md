@@ -68,21 +68,40 @@ y en el panel del hosting.
 
 Si faltan `DEPLOY_HOOK_*` o `APP_URL`, `cd.yml` publica las imágenes igualmente y avisa de que omite el despliegue.
 
-## Configuración del hosting (una sola vez)
+## Configuración del hosting en Render (una sola vez)
 
-Los pasos describen un hosting de contenedores con HTTPS automático (por ejemplo Render).
+Render ofrece HTTPS automático, despliegue desde imágenes de un registro y un plan gratuito. Se entra con la cuenta de GitHub en https://render.com.
+Orden recomendado: primero se publican las imágenes (el pull request `develop` → `main` lanza `cd.yml`) y después se crean los servicios.
 
-1. **Hacer públicas las imágenes.** Tras la primera ejecución de `cd.yml`, en GitHub: perfil → *Packages* → `bibliotech-backend` →
-   *Package settings* → *Change visibility* → Public. Repetir con `bibliotech-frontend`. (Alternativa: dar al hosting un token de lectura del registro.)
-2. **Base de datos.** Crear una base PostgreSQL en el hosting y anotar el servidor, el nombre, el usuario y la contraseña.
-3. **Backend.** Crear un servicio web desde una imagen existente: `ghcr.io/markmercado1/bibliotech-backend:latest`.
-   Variables de entorno: `SPRING_PROFILES_ACTIVE=prod` y las tres `SPRING_DATASOURCE_*`
-   (`jdbc:postgresql://<servidor>:5432/<base>`). Ruta de comprobación de salud: `/api/libros`.
-4. **Frontend.** Crear otro servicio web desde `ghcr.io/markmercado1/bibliotech-frontend:latest` con la variable
-   `BACKEND_URL` igual a la URL HTTPS pública del backend. El frontend llama a `/api` y nginx reenvía la petición al backend, de modo que el navegador solo habla con una dirección HTTPS.
-5. **Despliegue automático.** Copiar la URL del *Deploy Hook* de cada servicio a los secretos `DEPLOY_HOOK_BACKEND` y `DEPLOY_HOOK_FRONTEND`,
-   y la dirección HTTPS del frontend a la variable `APP_URL`.
+1. **Hacer públicas las imágenes.** En GitHub: perfil → *Packages* → `bibliotech-backend` → *Package settings* → *Change visibility* → Public.
+   Repetir con `bibliotech-frontend`. (Alternativa: registrar en Render un token de lectura del registro.)
+2. **Base de datos.** *New → PostgreSQL*, nombre `bibliotech-db`, plan **Free**. Al crearse, anotar el *Hostname* interno, el *Database*, el *Username* y el *Password*.
+3. **Backend.** *New → Web Service → Existing Image*, imagen `ghcr.io/markmercado1/bibliotech-backend:latest`, nombre `bibliotech-backend`, la misma región que la base de datos y plan **Free**.
+   Variables de entorno:
 
+   | Variable | Valor |
+   |---|---|
+   | `SPRING_PROFILES_ACTIVE` | `prod` |
+   | `SPRING_DATASOURCE_URL` | `jdbc:postgresql://<hostname interno>:5432/<database>` |
+   | `SPRING_DATASOURCE_USERNAME` | el *Username* de la base |
+   | `SPRING_DATASOURCE_PASSWORD` | el *Password* de la base |
+   | `JAVA_TOOL_OPTIONS` | `-XX:MaxRAMPercentage=65` (limita la memoria de Java al plan gratuito) |
+
+   En *Advanced* → *Health Check Path*: `/api/libros`. Render asigna el puerto con `PORT`, que el backend ya lee.
+4. **Frontend.** *New → Web Service → Existing Image*, imagen `ghcr.io/markmercado1/bibliotech-frontend:latest`, nombre `bibliotech-frontend`, plan **Free**.
+   Variable `BACKEND_URL` con la URL HTTPS que Render dio al backend (por ejemplo `https://bibliotech-backend.onrender.com`, sin barra final).
+   El frontend llama a `/api` y nginx reenvía la petición al backend: el navegador solo habla con una dirección HTTPS.
+5. **Despliegue automático.** En cada servicio: *Settings → Deploy Hook*, copiar la URL.
+   En GitHub (*Settings → Secrets and variables → Actions*): secretos `DEPLOY_HOOK_BACKEND` y `DEPLOY_HOOK_FRONTEND` con esas URL,
+   y la variable `APP_URL` con la dirección HTTPS del frontend. Después, ejecutar *BiblioTech CD* a mano (*Run workflow*, sin versión).
+
+`cd.yml` agrega `imgURL=<imagen:versión>` al *deploy hook*, así Render despliega exactamente la versión publicada y no una etiqueta móvil.
+La imagen indicada en el servicio de Render debe tener el mismo registro y repositorio que las que publica el workflow; solo cambia la etiqueta.
+
+**Limitaciones del plan gratuito.**
+- Los servicios se duermen tras 15 minutos sin visitas y tardan cerca de un minuto en despertar con la primera petición. La comprobación de `cd.yml` espera hasta 6 minutos por eso.
+- La base de datos gratuita expira a los 30 días y tiene 1 GB. Basta para la demostración; si expira se crea otra y se actualizan las tres variables `SPRING_DATASOURCE_*`.
+- La base de producción empieza vacía (Hibernate crea las tablas al arrancar); los datos se cargan desde la propia aplicación.
 ## Cómo comprobar un despliegue
 
 - Pestaña **Actions → BiblioTech CD**: los jobs *Publicar*, *Crear la etiqueta* y *Desplegar* en verde.

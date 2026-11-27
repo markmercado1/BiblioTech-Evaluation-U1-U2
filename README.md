@@ -16,6 +16,7 @@ bibliotech/
 ├── .github/workflows/   (ci.yml, sonar.yml, publish.yml)
 ├── backend/             (Spring Boot 4, Java 21)
 │   └── src/test/java/upeu/bibliotech_v2/
+│       ├── unitarias/   (JUnit 5 con patrón AAA y camino básico)
 │       ├── mockito/     (pruebas con @Mock / @InjectMocks)
 │       └── integracion/ (@WebMvcTest y @SpringBootTest)
 ├── frontend/            (Angular 22)
@@ -36,7 +37,7 @@ bibliotech/
 | Comando | Qué hace |
 |---|---|
 | `cd backend && mvn test` | Pruebas del backend |
-| `cd backend && mvn verify` | Pruebas del backend y verificación |
+| `cd backend && mvn verify` | Pruebas del backend, reporte JaCoCo (`backend/target/site/jacoco/index.html`) y verificación de cobertura mínima del 80 % |
 | `cd frontend && npm ci` | Instala dependencias del frontend |
 | `cd frontend && ng test --watch=false` | Pruebas Angular |
 | `cd frontend && ng lint` | Análisis estático del frontend |

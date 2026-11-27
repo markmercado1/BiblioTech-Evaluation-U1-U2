@@ -16,7 +16,7 @@ services:
       retries: 10
 
   backend:
-    image: ${REGISTRY:-ghcr.io/markmercado1}/bibliotech-backend:${VERSION:-1.0.0}
+    image: ${REGISTRY:-ghcr.io/markmercado1}/bibliotech-u2-backend:${VERSION:-1.0.0}
     environment:
       SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-prod}
       SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/${POSTGRES_DB}
@@ -29,7 +29,7 @@ services:
         condition: service_healthy
 
   frontend:
-    image: ${REGISTRY:-ghcr.io/markmercado1}/bibliotech-frontend:${VERSION:-1.0.0}
+    image: ${REGISTRY:-ghcr.io/markmercado1}/bibliotech-u2-frontend:${VERSION:-1.0.0}
     environment:
       BACKEND_URL: http://backend:8080
     ports:

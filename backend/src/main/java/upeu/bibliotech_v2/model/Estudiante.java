@@ -5,9 +5,15 @@ import jakarta.persistence.*;
 @Table(name = "estudiantes")
 public class Estudiante {
 
+    public static final String ACTIVO = "ACTIVO";
+    public static final String INACTIVO = "INACTIVO";
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(unique = true, nullable = false)
+    private String dni;
 
     private String nombre;
     private String estado;
@@ -20,12 +26,25 @@ public class Estudiante {
         this.estado = estado;
     }
 
+    public Estudiante(String dni, String nombre, String estado) {
+        this(nombre, estado);
+        this.dni = dni;
+    }
+
     public Long getId() {
         return id;
     }
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public String getDni() {
+        return dni;
+    }
+
+    public void setDni(String dni) {
+        this.dni = dni;
     }
 
     public String getNombre() {
